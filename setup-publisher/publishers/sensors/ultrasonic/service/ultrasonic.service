@@ -1,0 +1,12 @@
+[Unit]
+Description=Start ultrasonic service
+## make sure we only start the service after network is up
+Wants=network-online.target
+After=network.target
+
+[Service]
+Type=oneshot  
+ExecStart=/usr/bin/python /home/pi/Operations/publishers/sensors/ultrasonic/ultrasonic.py
+
+[Install]
+WantedBy=multi-user.target
