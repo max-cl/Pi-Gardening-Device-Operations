@@ -23,7 +23,7 @@ def addPublisherServiceContent(serviceFileDir, publisherDir, sensorName):
 
 	'[Service]' + '\n' +
 	'Type=oneshot' + '\n' +
-	'ExecStart=/usr/bin/python '+publisherDir+'/'+sensorName+'.py' + '\n' + '\n' +
+	'ExecStart=/usr/bin/python3 '+publisherDir+'/'+sensorName+'.py' + '\n' + '\n' +
 
 	'[Install]'+ '\n' +
 	'WantedBy=multi-user.target')
@@ -55,7 +55,7 @@ print("Starting setup of Pi-Gardening-Operations")
 print(">What do you want to setup?")
 print("[1] Device (General configuration)")
 print("[2] Add new publisher")
-setupOptionSelected = str(raw_input())
+setupOptionSelected = str(input())
 if(int(setupOptionSelected)==1):
 	print("\n>Setting Up general configuration for Pi-Gardening-Operations")
 
@@ -68,16 +68,16 @@ if(int(setupOptionSelected)==1):
 	config.read(currentDir + "/publishers/config.ini")
 
 	print('>What is the Broker Address?')
-	brokerAddress = str(raw_input())
+	brokerAddress = str(input())
 
 	print('>What is the Username (Credential Broker): ')
-	brokerUsername = str(raw_input())
+	brokerUsername = str(input())
 
 	print('>What is the Password (Credential Broker): ')
-	brokerPassword = str(raw_input())
+	brokerPassword = str(input())
 
 	print('>What is the Device Id (Raspberry Id registered in the DB): ')
-	deviceId = str(raw_input())
+	deviceId = str(input())
 
 	print("\nSaving data to config")
 	config.set("broker", 'brokerAddress', brokerAddress)
@@ -89,11 +89,17 @@ if(int(setupOptionSelected)==1):
 
 else:	
 	showSensorTypes()
-	sensorSelected = str(raw_input())
+	sensorSelected = str(input())
 	print("\n>Sensor selected: "+sensorSelected)
 
 	sensorName = sensorsType[str(sensorSelected)]
 	print("\n>Sensor Name: "+sensorName)
+
+	if sensorName == "dht11":
+		os.system("sudo pip3 install adafruit-circuitpython-dht")
+		os.system("sudo pip3 install paho-mqtt")
+		os.system("sudo pip3 install bson")
+		os.system("sudo apt-get install libgpiod2")
 
 	newPublisherDir = currentDir+"/publishers/sensors/"+sensorName
 	os.system("mkdir -p "+newPublisherDir)
@@ -116,7 +122,7 @@ else:
 	os.system("chmod -R 777 "+newPublisherDir+"/logs")
 
 	print("\n>What is the Sensor Id (Sensor Id registered in the DB): ")
-	sensorId = str(raw_input())
+	sensorId = str(input())
 	
 	config = ConfigParser.RawConfigParser()
 	config.read(newPublisherDir + "/config.ini")
