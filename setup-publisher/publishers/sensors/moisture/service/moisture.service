@@ -1,0 +1,12 @@
+[Unit]
+Description=Start moisture service
+## make sure we only start the service after network is up
+Wants=network-online.target
+After=network.target
+
+[Service]
+Type=oneshot  
+ExecStart=/usr/bin/python3 /home/pi/Operations/publishers/sensors/moisture/moisture.py
+
+[Install]
+WantedBy=multi-user.target
