@@ -6,23 +6,11 @@ import datetime
 import socket
 import os
 import configparser
-import RPi.GPIO as GPIO
+import board
+import adafruit_dht
 
-### GPIO ###
-# Disable warnings
-GPIO.setwarnings(False)
-
-#GPIO Mode (BOARD / BCM)
-GPIO.setmode(GPIO.BCM)
-
-#set GPIO Pins
-GPIO_TRIGGER = 18
-GPIO_ECHO = 8
-
-#set GPIO direction (IN / OUT)
-GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
-GPIO.setup(GPIO_ECHO, GPIO.IN)
-###################################
+# Initial the dht device, with data pin connected to:
+dhtDevice = adafruit_dht.DHT11(board.D4)
 
 # Hostname
 hostname = socket.gethostname()
@@ -55,32 +43,14 @@ client = mqtt.Client(sensorId)
 client.username_pw_set(username=brokerUsername,password=brokerPassword)
 client.connect(str(brokerAddress), int(brokerPort), 60)
 
-def distance():
-    # set Trigger to HIGH
-    GPIO.output(GPIO_TRIGGER, True)
-
-    # set Trigger after 0.01ms to LOW
-    time.sleep(0.00001)
-    GPIO.output(GPIO_TRIGGER, False)
-
-    StartTime = time.time()
-    StopTime = time.time()
-
-    # save StartTime
-    while GPIO.input(GPIO_ECHO) == 0:
-        StartTime = time.time()
-
-    # save time of arrival
-    while GPIO.input(GPIO_ECHO) == 1:
-        StopTime = time.time()
-
-    # time difference between start and arrival
-    TimeElapsed = StopTime - StartTime
-    # multiply with the sonic speed (34300 cm/s)
-    # and divide by 2, because there and back
-    distance = (TimeElapsed * 34300) / 2
-
-    return distance
+def getTemperatureAndHumidity():
+    # Print the values to the serial port
+    temperature_c = dhtDevice.temperature
+    temperature_f = temperature_c * (9 / 5) + 32
+    humidity = dhtDevice.humidity
+    print("Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(temperature_f, temperature_c, humidity))
+    result = { "temperature": temperature_c, "humidity": humidity }
+    return result
 
 ### LOGS ###
 def generateLogName():
@@ -111,15 +81,15 @@ if __name__ == '__main__':
             now = datetime.datetime.now()
             # dd/mm/YY H:M:S
             dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            dist = distance()
+            result = getTemperatureAndHumidity()
 
-            data = json.dumps({ "value": str(round(dist, 1)), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
+            data = json.dumps({ "temperature": str(round(result["temperature"], 1)), "humidity": str(round(result["humidity"], 1)), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
             client.publish(topic, data)
-            print("Just published " + str(round(dist, 1)) + " to Topic: "+topic+" Date: "+dt_string)
-            addLogEntry('Info', "Just published " + str(round(dist, 1)) + " to Topic: "+topic+" Date: "+dt_string)
+            print("Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
+            addLogEntry('Info', "Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
             time.sleep(10)
 
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
-        GPIO.cleanup()
+        
