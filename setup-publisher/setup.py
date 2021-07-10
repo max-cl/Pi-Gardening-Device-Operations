@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os
-import ConfigParser
+import configparser
 
 '''
 publishers
@@ -64,7 +64,7 @@ if(int(setupOptionSelected)==1):
 	os.system("cp publishers/config.ini "+currentDir+"/publishers/")
 
 	# Reading Config file
-	config = ConfigParser.RawConfigParser()
+	config = configparser.RawConfigParser()
 	config.read(currentDir + "/publishers/config.ini")
 
 	print('>What is the Broker Address?')
@@ -124,7 +124,7 @@ else:
 	print("\n>What is the Sensor Id (Sensor Id registered in the DB): ")
 	sensorId = str(input())
 	
-	config = ConfigParser.RawConfigParser()
+	config = configparser.RawConfigParser()
 	config.read(newPublisherDir + "/config.ini")
 
 	print("\n>Saving data to new PUBLISHER config")

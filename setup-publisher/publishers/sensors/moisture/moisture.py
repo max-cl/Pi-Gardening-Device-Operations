@@ -7,11 +7,15 @@ import datetime
 import socket
 import os
 import configparser
-import board
-import adafruit_dht
+import RPi.GPIO as GPIO
 
-# Initial the dht device, with data pin connected to:
-dhtDevice = adafruit_dht.DHT11(board.D4)
+#GPIO SETUP
+# Define the GPIO pin that we have our digital output from our sensor connected to
+channel = 21
+# Set our GPIO numbering to BCM
+GPIO.setmode(GPIO.BCM)
+# Set the GPIO pin to an input
+GPIO.setup(channel, GPIO.IN)
 
 # Hostname
 hostname = socket.gethostname()
@@ -44,14 +48,21 @@ client = mqtt.Client(sensorId)
 client.username_pw_set(username=brokerUsername,password=brokerPassword)
 client.connect(str(brokerAddress), int(brokerPort), 60)
 
-def getTemperatureAndHumidity():
-    # Print the values to the serial port
-    temperature_c = dhtDevice.temperature
-    temperature_f = temperature_c * (9 / 5) + 32
-    humidity = dhtDevice.humidity
-    print("Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(temperature_f, temperature_c, humidity))
-    result = { "temperature": temperature_c, "humidity": humidity }
-    return result
+def getMoisture(channel):
+    # Datetime object containing current date and time
+    now = datetime.datetime.now()
+    # dd/mm/YY H:M:S
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    
+    if GPIO.input(channel):
+        result = 0
+    else:
+        result = 1
+
+    data = json.dumps({ "moisture": str(result), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
+    client.publish(topic, data)
+    print("Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
+    addLogEntry('Info', "Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
 
 ### LOGS ###
 def generateLogName():
@@ -73,24 +84,19 @@ def addLogEntry(type, message):
 
 #####################################################################################################################
 
+# This line tells our script to keep an eye on our gpio pin and let us know when the pin goes HIGH or LOW
+GPIO.add_event_detect(channel, GPIO.BOTH, bouncetime=300)
+# This line asigns a function to the GPIO pin so that when the above line tells us there is a change on the pin, run this function
+GPIO.add_event_callback(channel, getMoisture)
+
 if __name__ == '__main__':
     try:
         ### CREATE A NAME FILE LOG ###
         generateLogName()
         while True:
-            # Datetime object containing current date and time
-            now = datetime.datetime.now()
-            # dd/mm/YY H:M:S
-            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            result = getTemperatureAndHumidity()
-
-            data = json.dumps({ "temperature": str(round(result["temperature"], 1)), "humidity": str(round(result["humidity"], 1)), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
-            client.publish(topic, data)
-            print("Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
-            addLogEntry('Info', "Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
-            time.sleep(10)
+            time.sleep(1)
 
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
         print("Measurement stopped by User")
-        
+        GPIO.cleanup()
