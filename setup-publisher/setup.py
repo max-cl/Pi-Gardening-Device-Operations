@@ -68,16 +68,16 @@ if(int(setupOptionSelected)==1):
 	config.read(currentDir + "/publishers/config.ini")
 
 	print('>What is the Broker Address?')
-	brokerAddress = str(input())
+	brokerAddress = str(raw_input())
 
 	print('>What is the Username (Credential Broker): ')
-	brokerUsername = str(input())
+	brokerUsername = str(raw_input())
 
 	print('>What is the Password (Credential Broker): ')
-	brokerPassword = str(input())
+	brokerPassword = str(raw_input())
 
 	print('>What is the Device Id (Raspberry Id registered in the DB): ')
-	deviceId = str(input())
+	deviceId = str(raw_input())
 
 	print("\nSaving data to config")
 	config.set("broker", 'brokerAddress', brokerAddress)
@@ -122,7 +122,7 @@ else:
 	os.system("chmod -R 777 "+newPublisherDir+"/logs")
 
 	print("\n>What is the Sensor Id (Sensor Id registered in the DB): ")
-	sensorId = str(input())
+	sensorId = str(raw_input())
 	
 	config = configparser.RawConfigParser()
 	config.read(newPublisherDir + "/config.ini")
