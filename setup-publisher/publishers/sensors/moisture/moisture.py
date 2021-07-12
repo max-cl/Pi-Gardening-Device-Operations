@@ -59,7 +59,7 @@ def getMoisture(channel):
     else:
         result = 1
 
-    data = json.dumps({ "moisture": str(result), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
+    data = json.dumps({ "value": str(result), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
     client.publish(topic, data)
     print("Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
     addLogEntry('Info', "Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
