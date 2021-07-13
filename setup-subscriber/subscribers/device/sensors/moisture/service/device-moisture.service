@@ -1,12 +1,12 @@
 [Unit]
-Description=Start ultrasonic service
+Description=Start moisture service
 ## Make sure we only start the service after network is up
 Wants=network-online.target
 After=network.target
 
 [Service]
 Type=oneshot  
-ExecStart=/usr/bin/python /home/pi/Operations/subscribers/device/ultrasonic/ultrasonic.py
+ExecStart=/usr/bin/python /home/pi/Operations/subscribers/device/moisture/moisture.py
 
 [Install]
 WantedBy=multi-user.target
