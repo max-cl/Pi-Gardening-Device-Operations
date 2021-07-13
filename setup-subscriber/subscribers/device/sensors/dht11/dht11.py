@@ -46,8 +46,8 @@ dbCollectionName = config.get('database', 'dbCollectionName')
 connectionTimeout = config.get('database', 'connectionTimeout')
 
 
-def insert_document(collectionName, documentToInsert):
-    collectionName.insert_one(documentToInsert)
+def insert_documents(collectionName, documentsToInsert):
+    collectionName.insert_many(documentsToInsert)
 
 def mongodb_connection(stringDBConnection, connectionTimeout):
     mongo_client = MongoClient(stringDBConnection,serverSelectionTimeoutMS=connectionTimeout,connectTimeoutMS=connectionTimeout,socketTimeoutMS=connectionTimeout) 
@@ -61,8 +61,9 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     message=msg.payload.decode("utf-8")
     dataJson = json.loads(message)
-    print({ "date": dataJson["date"], "sensorId": ObjectId(dataJson["sensorId"]), "deviceId": ObjectId(dataJson["deviceId"]), "temperature": float(dataJson["temperature"]), "humidity": float(dataJson["humidity"]) })
-    insert_document(collection, { "date": str(dataJson["date"]), "sensorId": ObjectId(dataJson["sensorId"]), "deviceId": ObjectId(dataJson["deviceId"]), "temperature": float(dataJson["temperature"]), "humidity": float(dataJson["humidity"]) })
+    dataResult = [{ "date": dataJson[0]["date"], "sensorId": ObjectId(dataJson[0]["sensorId"]), "deviceId": ObjectId(dataJson[0]["deviceId"]), "value": float(dataJson[0]["temperature"]) }, { "date": dataJson[1]["date"], "sensorId": ObjectId(dataJson[1]["sensorId"]), "deviceId": ObjectId(dataJson[1]["deviceId"]), "value": float(dataJson[1]["humidity"]) }]
+    print(dataResult)
+    insert_documents(collection, dataResult)
 
 
 # Set up client for MongoDB
