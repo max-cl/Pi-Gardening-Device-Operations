@@ -34,13 +34,14 @@ brokerPassword = config.get('broker', 'brokerPassword')
 
 ### DEVICE AND SENSOR INFORMATION ###
 deviceId = config.get('publisher', 'deviceId')
-sensorId = configSensor.get('publisher', 'sensorId')
+sensorId1 = configSensor.get('publisher', 'sensorId1')
+sensorId2 = configSensor.get('publisher', 'sensorId2')
 
 # Topic
 sensorTopic = configSensor.get('topic', 'sensorTopic')
 topic = hostname+"/"+sensorTopic
 
-client = mqtt.Client(sensorId)
+client = mqtt.Client(sensorId1+" and "+sensorId2)
 client.username_pw_set(username=brokerUsername,password=brokerPassword)
 client.connect(str(brokerAddress), int(brokerPort), 60)
 
@@ -83,8 +84,7 @@ if __name__ == '__main__':
             # dd/mm/YY H:M:S
             dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
             result = getTemperatureAndHumidity()
-
-            data = json.dumps({ "temperature": str(round(result["temperature"], 1)), "humidity": str(round(result["humidity"], 1)), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
+            data = json.dumps([{ "temperature": str(round(result["temperature"], 1)), "sensorId": ObjectId(sensorId1), "deviceId": ObjectId(deviceId), "date": dt_string }, { "humidity": str(round(result["humidity"], 1)), "sensorId": ObjectId(sensorId2), "deviceId": ObjectId(deviceId), "date": dt_string }], default=str)
             client.publish(topic, data)
             print("Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)
             addLogEntry('Info', "Just published " + str(result) + " to Topic: "+topic+" Date: "+dt_string)

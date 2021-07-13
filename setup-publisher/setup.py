@@ -121,14 +121,23 @@ else:
 	os.system("mkdir "+newPublisherDir+"/logs")
 	os.system("chmod -R 777 "+newPublisherDir+"/logs")
 
-	print("\n>What is the Sensor Id (Sensor Id registered in the DB): ")
-	sensorId = str(raw_input())
-	
 	config = configparser.RawConfigParser()
 	config.read(newPublisherDir + "/config.ini")
 
-	print("\n>Saving data to new PUBLISHER config")
-	config.set("publisher", "sensorId", sensorId)
+	if sensorName == "dht11":
+		print("\n>What is the Sensor Id for TEMPERATURE (DHT11) (Sensor Id registered in the DB): ")
+		sensorId1 = str(raw_input())
+		print("\n>What is the Sensor Id for HUMIDITY (DHT11) (Sensor Id registered in the DB): ")
+		sensorId2 = str(raw_input())
+		print("\n>Saving data to new PUBLISHER config")
+		config.set("publisher", "sensorId1", sensorId1)
+		config.set("publisher", "sensorId2", sensorId2)
+	else:
+		print("\n>What is the Sensor Id (Sensor Id registered in the DB): ")
+		sensorId = str(raw_input())
+		print("\n>Saving data to new PUBLISHER config")
+		config.set("publisher", "sensorId", sensorId)
+	
 	with open(newPublisherDir + "/config.ini", "w") as configFile:
 		config.write(configFile)
 
