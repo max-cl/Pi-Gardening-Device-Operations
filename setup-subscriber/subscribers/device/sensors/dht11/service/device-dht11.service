@@ -1,0 +1,12 @@
+[Unit]
+Description=Start dht11 service
+## Make sure we only start the service after network is up
+Wants=network-online.target
+After=network.target
+
+[Service]
+Type=oneshot  
+ExecStart=/usr/bin/python /home/pi/Operations/subscribers/device/dht11/dht11.py
+
+[Install]
+WantedBy=multi-user.target
