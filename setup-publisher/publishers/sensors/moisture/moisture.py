@@ -55,9 +55,9 @@ def getMoisture(channel):
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     
     if GPIO.input(channel):
-        result = 0
+        result = 1  # No water Detected
     else:
-        result = 1
+        result = 0  # Water Detected
 
     data = json.dumps({ "value": str(result), "sensorId": ObjectId(sensorId), "deviceId": ObjectId(deviceId), "date": dt_string }, default=str)
     client.publish(topic, data)
