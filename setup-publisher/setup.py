@@ -87,6 +87,20 @@ if(int(setupOptionSelected)==1):
 	with open(currentDir + "/publishers/config.ini", "w") as configFile:
 		config.write(configFile)
 
+	print("\n>Copying DEVICE-MANAGER service file.")
+	os.system("sudo cp publishers/device-manager/service/device-manager.service /etc/systemd/system/")
+	os.system("sudo systemctl daemon-reload")
+	os.system("sudo systemctl enable device-manager.service")
+
+	print(">Do you want to reboot the device?")
+	print("[1] YES")
+	print("[2] NO")
+	doReboot = str(input())
+	if doReboot == 1:
+		os.system("sudo systemctl reboot")
+	else:
+		print("GENERAL CONFIGURATION DONE!")
+
 else:	
 	showSensorTypes()
 	sensorSelected = str(input())
@@ -141,7 +155,18 @@ else:
 	with open(newPublisherDir + "/config.ini", "w") as configFile:
 		config.write(configFile)
 
-	print("\n>Copying service file and setting them up")
+	print("\n>Copying PUBLISHER service file.")
 	os.system("sudo cp "+serviceDir+"/* /etc/systemd/system/")
+
+	print("\n>Setting them up SERVICES.")
 	os.system("sudo systemctl daemon-reload")
 	os.system("sudo systemctl enable "+sensorName+".service")
+
+	print(">Do you want to reboot the device?")
+	print("[1] YES")
+	print("[2] NO")
+	doReboot = str(input())
+	if doReboot == 1:
+		os.system("sudo systemctl reboot")
+	else:
+		print("Sensor "+sensorName+" (PUBLISHER) CONFIGURATION DONE!")

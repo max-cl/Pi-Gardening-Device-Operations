@@ -1,0 +1,12 @@
+[Unit]
+Description=Start device-manager service
+## Make sure we only start the service after network is up
+Wants=network-online.target
+After=network.target
+
+[Service]
+Type=oneshot  
+ExecStart=/usr/bin/python3 /home/pi/Operations/publishers/device-manager/device-manager.py
+
+[Install]
+WantedBy=multi-user.target
