@@ -119,6 +119,10 @@ if(int(setupOptionSelected)==1):
 	with open(currentDir + "/publishers/config.ini", "w") as configFile:
 		config.write(configFile)
 
+	print("\n>Copying DEVICE-MANAGER script.")
+	os.system("mkdir -p "+currentDir+"/publishers/device-manager")
+	os.system("cp publishers/device-manager/device-manager.py "+currentDir+"/publishers/device-manager/")
+
 	print("\n>Copying DEVICE-MANAGER service file.")
 	os.system("sudo cp publishers/device-manager/service/device-manager.service /etc/systemd/system/")
 	os.system("sudo systemctl daemon-reload")
