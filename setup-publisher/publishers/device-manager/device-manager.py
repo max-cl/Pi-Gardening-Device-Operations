@@ -20,7 +20,7 @@ brokerUsername = config.get('broker', 'brokerUsername')
 brokerPassword = config.get('broker', 'brokerPassword')
 
 ### DEVICE INFO ##
-deviceId = config.get('publisher', 'brokerPassword')
+deviceId = config.get('publisher', 'deviceId')
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
