@@ -13,11 +13,11 @@ subscribers
             - sensor1.service
 '''
 
-def addSubscriberServiceContent(serviceFileDir, subscribeDir, sensorName, hostnameDevice):
+def addSubscriberServiceContent(serviceFileDir, subscribeDir, sensorName, deviceId):
 	file = open(serviceFileDir, 'w+')
 	file.write(
 	'[Unit]'+ '\n' +
-	'Description=Start '+ sensorName +' service (' + hostnameDevice + ')\n' 
+	'Description=Start '+ sensorName +' service (' + deviceId + ')\n' 
 	'## Make sure we only start the service after network is up' + '\n' +
 	'Wants=network-online.target' + '\n' +
 	'After=network.target' + '\n' + '\n' +
@@ -108,17 +108,17 @@ else:
     config = ConfigParser.RawConfigParser()
     config.read(currentDir + "/subscribers/device/config.ini")
 
-    print("\n>What is the Hostname of the new Device:")
-    hostnamePublisher = str(raw_input())
+    print("\n>What is the Device Id (Raspberry Id registered in the DB):")
+    deviceId = str(raw_input())
 
     print("\n>Saving data to config")
-    config.set("publisher", "hostnamePublisher", hostnamePublisher)
+    config.set("publisher", "deviceId", deviceId)
 
     with open(currentDir + "/subscribers/device/config.ini", "w") as configFile:
         config.write(configFile)
 
-    os.system("mv "+currentDir+"/subscribers/device "+currentDir+"/subscribers/"+hostnamePublisher)
-    os.system("mkdir -p "+currentDir+"/subscribers/"+hostnamePublisher+"/sensors")
+    os.system("mv "+currentDir+"/subscribers/device "+currentDir+"/subscribers/"+deviceId)
+    os.system("mkdir -p "+currentDir+"/subscribers/"+deviceId+"/sensors")
 
     showSensorTypes()
     sensorSelected = str(raw_input())
@@ -127,19 +127,19 @@ else:
     sensorName = sensorsType[str(sensorSelected)]
     print("\n>Sensor Name: "+sensorName)
 
-    newSubscribeDir = currentDir+"/subscribers/"+hostnamePublisher+"/sensors/"+sensorName
+    newSubscribeDir = currentDir+"/subscribers/"+deviceId+"/sensors/"+sensorName
     os.system("mkdir -p "+newSubscribeDir)
     print("\n>New subscriber directory created: "+newSubscribeDir)
 
     serviceDir = newSubscribeDir+"/service"
     os.system("mkdir "+serviceDir)
-    os.system("touch "+serviceDir+"/"+hostnamePublisher+"-"+sensorName+".service")
+    os.system("touch "+serviceDir+"/"+deviceId+"-"+sensorName+".service")
 
     print("\n>Setting up the "+sensorName+" service file.")
 	# Adding Service Content 
-    addSubscriberServiceContent(serviceDir+"/"+hostnamePublisher+"-"+sensorName+".service",newSubscribeDir, sensorName, hostnamePublisher)
+    addSubscriberServiceContent(serviceDir+"/"+deviceId+"-"+sensorName+".service",newSubscribeDir, sensorName, deviceId)
 
-    print("\n>Setting up the "+sensorName+" script file from Device "+hostnamePublisher+".")
+    print("\n>Setting up the "+sensorName+" script file from Device "+deviceId+".")
     os.system("cp subscribers/device/sensors/"+sensorName+"/"+sensorName+".py "+newSubscribeDir+"/")
     os.system("cp subscribers/device/sensors/"+sensorName+"/config.ini "+newSubscribeDir+"/")
 
@@ -150,4 +150,4 @@ else:
     print("\n>Copying service file and setting them up")
     os.system("sudo cp "+serviceDir+"/* /etc/systemd/system/")
     os.system("sudo systemctl daemon-reload")
-    os.system("sudo systemctl enable "+hostnamePublisher+"-"+sensorName+".service")
+    os.system("sudo systemctl enable "+deviceId+"-"+sensorName+".service")

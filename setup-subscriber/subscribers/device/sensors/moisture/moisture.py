@@ -34,7 +34,7 @@ brokerUsername = config.get('broker', 'brokerUsername')
 brokerPassword = config.get('broker', 'brokerPassword')
 
 ### PUBLISHER ###
-hostnamePublisher = configDevice.get('publisher', 'hostnamePublisher')
+deviceId = configDevice.get('publisher', 'deviceId')
 
 ### TOPICS ###
 sensorTopic = configSubscriber.get('topic', 'sensorTopic')
@@ -55,8 +55,8 @@ def mongodb_connection(stringDBConnection, connectionTimeout):
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    print("Topic: "+hostnamePublisher+"/"+sensorTopic)
-    client.subscribe(hostnamePublisher+"/"+sensorTopic)
+    print("Topic: "+deviceId+"/"+sensorTopic)
+    client.subscribe(deviceId+"/"+sensorTopic)
 
 def on_message(client, userdata, msg):
     message=msg.payload.decode("utf-8")
