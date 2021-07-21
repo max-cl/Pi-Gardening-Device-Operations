@@ -4,7 +4,6 @@ import time
 import json
 from bson.objectid import ObjectId
 import datetime
-import socket
 import os
 import configparser
 import RPi.GPIO as GPIO
@@ -16,9 +15,6 @@ channel = 21
 GPIO.setmode(GPIO.BCM)
 # Set the GPIO pin to an input
 GPIO.setup(channel, GPIO.IN)
-
-# Hostname
-hostname = socket.gethostname()
 
 # GENERAL CONFIG
 config = configparser.RawConfigParser()
@@ -42,7 +38,7 @@ sensorId = configSensor.get('publisher', 'sensorId')
 
 # Topic
 sensorTopic = configSensor.get('topic', 'sensorTopic')
-topic = hostname+"/"+sensorTopic
+topic = deviceId+"/"+sensorTopic
 
 client = mqtt.Client(sensorId)
 client.username_pw_set(username=brokerUsername,password=brokerPassword)

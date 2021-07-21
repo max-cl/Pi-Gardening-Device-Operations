@@ -4,7 +4,6 @@ import time
 import json
 from bson.objectid import ObjectId
 import datetime
-import socket
 import os
 import configparser
 import board
@@ -12,9 +11,6 @@ import adafruit_dht
 
 # Initial the dht device, with data pin connected to:
 dhtDevice = adafruit_dht.DHT11(board.D4)
-
-# Hostname
-hostname = socket.gethostname()
 
 # GENERAL CONFIG
 config = configparser.RawConfigParser()
@@ -39,7 +35,7 @@ sensorId2 = configSensor.get('publisher', 'sensorId2')
 
 # Topic
 sensorTopic = configSensor.get('topic', 'sensorTopic')
-topic = hostname+"/"+sensorTopic
+topic = deviceId+"/"+sensorTopic
 
 client = mqtt.Client(sensorId1+" and "+sensorId2)
 client.username_pw_set(username=brokerUsername,password=brokerPassword)

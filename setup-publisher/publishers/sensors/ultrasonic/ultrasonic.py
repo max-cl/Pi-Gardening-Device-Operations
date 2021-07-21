@@ -4,7 +4,6 @@ import time
 import json
 from bson.objectid import ObjectId
 import datetime
-import socket
 import os
 import configparser
 import RPi.GPIO as GPIO
@@ -12,21 +11,14 @@ import RPi.GPIO as GPIO
 ### GPIO ###
 # Disable warnings
 GPIO.setwarnings(False)
-
 #GPIO Mode (BOARD / BCM)
 GPIO.setmode(GPIO.BCM)
-
 #set GPIO Pins
 GPIO_TRIGGER = 18
 GPIO_ECHO = 8
-
 #set GPIO direction (IN / OUT)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
-###################################
-
-# Hostname
-hostname = socket.gethostname()
 
 # GENERAL CONFIG
 config = configparser.RawConfigParser()
@@ -50,7 +42,7 @@ sensorId = configSensor.get('publisher', 'sensorId')
 
 # Topic
 sensorTopic = configSensor.get('topic', 'sensorTopic')
-topic = hostname+"/"+sensorTopic
+topic = deviceId+"/"+sensorTopic
 
 client = mqtt.Client(sensorId)
 client.username_pw_set(username=brokerUsername,password=brokerPassword)
